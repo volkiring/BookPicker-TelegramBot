@@ -1,9 +1,7 @@
 ﻿
-using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 string token = "8142383621:AAGGxzdxmaj-gUtZ-pNtD6HMYR1YiJsNJ7I";
 TelegramBotClient telegramBotClient = new TelegramBotClient(
@@ -29,32 +27,7 @@ async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationT
     {
         if (update.Message.Text == "/start")
         {
-            await MainMenu(client, chatId);
+            await client.SendTextMessageAsync(chatId, "");
         }
     }
-}
-
-async Task MainMenu(ITelegramBotClient client, long chatId)
-{
-    InlineKeyboardMarkup inlineKeyboard = new(new[]
-    {
-        new []
-        {
-            InlineKeyboardButton.WithCallbackData(text: "Книги месяца", callbackData: "booksOfMonth")
-        },
-        new []
-        {
-            InlineKeyboardButton.WithCallbackData(text: "Выбрать книгу", callbackData: "chooseBook")
-        },
-        new []
-        {
-            InlineKeyboardButton.WithCallbackData(text: "Закладки", callbackData: "bookmarks"),
-            InlineKeyboardButton.WithCallbackData(text: "Ежедневное чтение", callbackData: "everydayReading"),
-        }
-    });
-    await client.SendTextMessageAsync(
-        chatId: chatId,
-        text: "Добро пожаловать! Выберите действие, которое хотите совершить:",
-        replyMarkup: inlineKeyboard
-        );
 }
