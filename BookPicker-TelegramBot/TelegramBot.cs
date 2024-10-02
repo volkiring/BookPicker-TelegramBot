@@ -32,7 +32,7 @@ public class Program
 
     static async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Message?.Text == null)
+        if (update.Message.Text == null)
         {
             return;
         }
