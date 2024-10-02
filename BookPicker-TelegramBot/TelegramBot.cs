@@ -80,6 +80,15 @@ public class Program
             replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup);
         }
 
+        //else
+        //{
+        //    await client.EditMessageTextAsync(
+        //    chatId: telegramUserId,
+        //    messageId: update.CallbackQuery.Message.MessageId,
+        //    text: result.Text,
+        //    replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup);
+        //}
+
         storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
     }
 }
