@@ -4,6 +4,7 @@ using BookPicker_TelegramBot.User;
 using BookPicker_TelegramBot.User.Pages;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 public class Program
 {
@@ -32,12 +33,22 @@ public class Program
 
     static async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Message.Text == null)
+        if (update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && update.Type != Telegram.Bot.Types.Enums.UpdateType.Message)
         {
             return;
         }
 
-        long telegramUserId = update.Message.From.Id;
+        long telegramUserId;
+
+        if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+        {
+            telegramUserId = update.CallbackQuery.From.Id;
+        }
+        else
+        {
+            telegramUserId = update.Message.From.Id;
+        }
+
         Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
 
         var IsExistUserState = storage.TryGet(telegramUserId, out var userState);
@@ -46,17 +57,28 @@ public class Program
         {
             userState = new UserState(new NotStatedPage(), new UserData());
         }
+
         Console.WriteLine($"update.Id={update.Id}  currentState={userState}");
 
         var result = userState!.Page.Handle(update, userState);
         Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
 
-
-        await client.SendTextMessageAsync(
+        if (!IsExistUserState)
+        {
+            await client.SendTextMessageAsync(
+                chatId: telegramUserId,
+                text: result.Text,
+                replyMarkup: result.ReplyMarkup
+                );
+        }
+        else
+        {
+            await client.EditMessageTextAsync(
             chatId: telegramUserId,
+            messageId: update.CallbackQuery.Message.MessageId,
             text: result.Text,
-            replyMarkup: result.ReplyMarkup
-            );
+            replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup);
+        }
 
         storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
     }

@@ -18,50 +18,48 @@ namespace BookPicker_TelegramBot.User.Pages
             };
         }
 
-        public ReplyKeyboardMarkup GetReplyMarkup()
-        {
-            return new ReplyKeyboardMarkup(
-                [
-                    [
-                        new KeyboardButton("Книги месяца")
-                    ],
-
-                    [
-                        new KeyboardButton("Выбрать книгу")
-                    ],
-
-                    [
-                        new KeyboardButton("Закладки"),
-                         new KeyboardButton("Ежедневное чтение")
-                    ]
-                ])
-            {
-                ResizeKeyboard = true
-            };
-        }
-
         public PageResult Handle(Update update, UserState userState)
         {
-            if (update.Message?.Text == null)
-            {
-                return new PageResult("Нажмите на кнопки", GetReplyMarkup());
-            }
-
-            if (update.Message.Text == "Книги месяца")
+            if (update.CallbackQuery.Data == "Книги месяца")
             {
                 return new BookOfMonthPage().View(update, userState);
             }
 
-            if (update.Message.Text == "Закладки")
+            if (update.CallbackQuery.Data == "Выбрать книгу")
+            {
+                return new ChoosingBookPage().View(update, userState);
+            }
+
+            if (update.CallbackQuery.Data == "Закладки")
             {
                 return new BookmatePage().View(update, userState);
             }
 
-            if (update.Message.Text == "Ежедневное чтение")
+            if (update.CallbackQuery.Data == "Ежедневное чтение")
             {
                 return new DailyReadingPage().View(update, userState);
             }
             return null;
         }
+
+        public IReplyMarkup GetReplyMarkup()
+        {
+            return new InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton.WithCallbackData("Книги месяца")
+                    ],
+
+                    [
+                       InlineKeyboardButton.WithCallbackData("Выбрать книгу")
+                    ],
+
+                    [
+                        InlineKeyboardButton.WithCallbackData("Закладки"),
+                         InlineKeyboardButton.WithCallbackData("Ежедневное чтение")
+                    ]
+                ]);
+        }
     }
 }
+
