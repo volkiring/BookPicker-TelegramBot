@@ -1,4 +1,5 @@
 ﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
@@ -12,6 +13,25 @@ namespace BookPicker_TelegramBot.User.Pages
         public PageResult View(Update update, UserState userState)
         {
             throw new NotImplementedException();
+        }
+
+        public IReplyMarkup GetReplyMarkup()
+        {
+            return new InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton.WithCallbackData("Книги месяца")
+                    ],
+
+                    [
+                       InlineKeyboardButton.WithCallbackData("Выбрать книгу")
+                    ],
+
+                    [
+                        InlineKeyboardButton.WithCallbackData("Закладки"),
+                         InlineKeyboardButton.WithCallbackData("Ежедневное чтение")
+                    ]
+                ]);
         }
     }
 }

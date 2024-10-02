@@ -3,13 +3,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
-    public class BookOfMonthPage : IPage
+    public class ChoosingBookPage : IPage
     {
-
 
         public PageResult View(Update update, UserState userState)
         {
-            var text = @"Вот книги, которые чаще всего пользователи добавляют в закладки:";
+            var text = @"Выберите, по какому критерию будете
+выбирать книгу::";
 
             var replyMarkup = GetReplyMarkup();
 
@@ -33,11 +33,11 @@ namespace BookPicker_TelegramBot.User.Pages
             return new InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton.WithCallbackData("Книга 1")
+                        InlineKeyboardButton.WithCallbackData("Выбрать книгу по автору")
                     ],
 
                     [
-                       InlineKeyboardButton.WithCallbackData("Книга 2")
+                       InlineKeyboardButton.WithCallbackData("Выбрать книгу по жанру")
                     ],
 
                     [
@@ -45,5 +45,6 @@ namespace BookPicker_TelegramBot.User.Pages
                     ]
                 ]);
         }
+
     }
 }

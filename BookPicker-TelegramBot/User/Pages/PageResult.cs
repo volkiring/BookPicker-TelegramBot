@@ -6,10 +6,10 @@ namespace BookPicker_TelegramBot.User.Pages
     {
         public string Text { get; set; }
 
-        public ReplyMarkupBase ReplyMarkup { get; set; }
+        public IReplyMarkup ReplyMarkup { get; set; }
 
         public UserState UpdatedUserState { get; set; }
-        public PageResult(string text, ReplyMarkupBase replyMarkup)
+        public PageResult(string text, IReplyMarkup replyMarkup)
         {
             Text = text;
             ReplyMarkup = replyMarkup;
