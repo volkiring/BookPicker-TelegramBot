@@ -20,26 +20,19 @@ namespace BookPicker_TelegramBot.User.Pages
 
         public PageResult Handle(Update update, UserState userState)
         {
-            if (update.CallbackQuery.Data == "Книги месяца")
+            switch (update.CallbackQuery.Data)
             {
-                return new BookOfMonthPage().View(update, userState);
+                case "Книги месяца":
+                    return new BookOfMonthPage().View(update, userState);
+                case "Выбрать книгу":
+                    return new ChoosingBookPage().View(update, userState);
+                case "Закладки":
+                    return new BookmatePage().View(update, userState);
+                case "Ежедневное чтение":
+                    return new DailyReadingPage().View(update, userState);
+                default:
+                    return null;
             }
-
-            if (update.CallbackQuery.Data == "Выбрать книгу")
-            {
-                return new ChoosingBookPage().View(update, userState);
-            }
-
-            if (update.CallbackQuery.Data == "Закладки")
-            {
-                return new BookmatePage().View(update, userState);
-            }
-
-            if (update.CallbackQuery.Data == "Ежедневное чтение")
-            {
-                return new DailyReadingPage().View(update, userState);
-            }
-            return null;
         }
 
         public IReplyMarkup GetReplyMarkup()

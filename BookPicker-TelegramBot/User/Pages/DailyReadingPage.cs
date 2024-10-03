@@ -7,11 +7,13 @@ namespace BookPicker_TelegramBot.User.Pages
     {
         public PageResult Handle(Update update, UserState userState)
         {
-            if (update.CallbackQuery.Data == "Назад")
+            switch (update.CallbackQuery.Data)
             {
-                return new StartPage().View(update, userState);
+                case "Назад":
+                    return new StartPage().View(update, userState);
+                default:
+                    return null;
             }
-            return null;
         }
 
         public PageResult View(Update update, UserState userState)
