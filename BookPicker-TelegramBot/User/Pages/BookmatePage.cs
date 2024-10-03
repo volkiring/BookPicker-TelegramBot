@@ -5,14 +5,24 @@ namespace BookPicker_TelegramBot.User.Pages
 {
     public class BookmatePage : IPage
     {
-        public PageResult Handle(Update update, UserState Userstate)
+        public PageResult Handle(Update update, UserState userState)
         {
-            throw new NotImplementedException();
+            if (update.CallbackQuery.Data == "Назад")
+            {
+                return new StartPage().View(update, userState);
+            }
+            return null;
         }
 
         public PageResult View(Update update, UserState userState)
         {
-            throw new NotImplementedException();
+            var text = @"Вот книги, которые Вы добавили в закладки:";
+            var replyMarkup = GetReplyMarkup();
+
+            return new PageResult(text, replyMarkup)
+            {
+                UpdatedUserState = new UserState(this, userState.UserData)
+            };
         }
 
         public IReplyMarkup GetReplyMarkup()
@@ -20,16 +30,15 @@ namespace BookPicker_TelegramBot.User.Pages
             return new InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton.WithCallbackData("Книги месяца")
+                        InlineKeyboardButton.WithCallbackData("Книга 1")
                     ],
 
                     [
-                       InlineKeyboardButton.WithCallbackData("Выбрать книгу")
+                       InlineKeyboardButton.WithCallbackData("Книга 2")
                     ],
 
                     [
-                        InlineKeyboardButton.WithCallbackData("Закладки"),
-                         InlineKeyboardButton.WithCallbackData("Ежедневное чтение")
+                        InlineKeyboardButton.WithCallbackData("Назад"),
                     ]
                 ]);
         }

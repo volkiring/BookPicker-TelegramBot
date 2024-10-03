@@ -7,7 +7,7 @@ namespace BookPicker_TelegramBot.User.Pages
     {
         public PageResult View(Update update, UserState userState)
         {
-            var text = @"Здравствуйте!
+            var text = @"Здравствуйте\!
 Выберите действие, которое хотите совершить:";
 
             var replyMarkup = GetReplyMarkup();

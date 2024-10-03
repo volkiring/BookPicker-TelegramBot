@@ -68,8 +68,8 @@ public class Program
             await client.SendTextMessageAsync(
                 chatId: telegramUserId,
                 text: result.Text,
-                replyMarkup: result.ReplyMarkup
-                );
+                replyMarkup: result.ReplyMarkup,
+                parseMode: result.ParseMode);
         }
         else
         {
@@ -77,17 +77,9 @@ public class Program
             chatId: telegramUserId,
             messageId: update.CallbackQuery.Message.MessageId,
             text: result.Text,
-            replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup);
+            replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup,
+            parseMode: result.ParseMode);
         }
-
-        //else
-        //{
-        //    await client.EditMessageTextAsync(
-        //    chatId: telegramUserId,
-        //    messageId: update.CallbackQuery.Message.MessageId,
-        //    text: result.Text,
-        //    replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup);
-        //}
 
         storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
     }

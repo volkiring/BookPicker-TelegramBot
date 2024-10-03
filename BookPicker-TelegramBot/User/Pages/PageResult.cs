@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
@@ -9,6 +10,8 @@ namespace BookPicker_TelegramBot.User.Pages
         public IReplyMarkup ReplyMarkup { get; set; }
 
         public UserState UpdatedUserState { get; set; }
+
+        public ParseMode ParseMode { get; set; } = ParseMode.MarkdownV2;
         public PageResult(string text, IReplyMarkup replyMarkup)
         {
             Text = text;
