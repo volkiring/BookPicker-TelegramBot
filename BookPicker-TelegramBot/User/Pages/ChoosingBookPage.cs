@@ -12,10 +12,10 @@ namespace BookPicker_TelegramBot.User.Pages
 выбирать книгу::";
 
             var replyMarkup = GetReplyMarkup();
-
+            userState.AddPage(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
         }
 
@@ -24,7 +24,8 @@ namespace BookPicker_TelegramBot.User.Pages
             switch (update.CallbackQuery.Data)
             {
                 case "Назад":
-                    return new StartPage().View(update, userState);
+                    userState.Pages.Pop();
+                    return userState.CurrentPage.View(update, userState);
                 default:
                     return null;
             }

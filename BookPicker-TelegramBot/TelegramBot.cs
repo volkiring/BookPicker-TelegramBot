@@ -51,19 +51,19 @@ public class Program
 
         Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
 
-        var IsExistUserState = storage.TryGet(telegramUserId, out var userState);
+        var userState = await storage.TryGetAsync(telegramUserId);
 
-        if (!IsExistUserState)
+        if (userState == null)
         {
-            userState = new UserState(new NotStatedPage(), new UserData());
+            userState = new UserState(new Stack<IPage>([new NotStatedPage()]), new UserData());
         }
 
         Console.WriteLine($"update.Id={update.Id}  currentState={userState}");
 
-        var result = userState!.Page.Handle(update, userState);
+        var result = userState!.CurrentPage.Handle(update, userState);
         Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
 
-        if (!IsExistUserState)
+        if (userState == null)
         {
             await client.SendTextMessageAsync(
                 chatId: telegramUserId,
@@ -83,4 +83,4 @@ public class Program
 
         storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
     }
-}
+} 

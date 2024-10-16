@@ -11,10 +11,10 @@ namespace BookPicker_TelegramBot.User.Pages
 Выберите действие, которое хотите совершить:";
 
             var replyMarkup = GetReplyMarkup();
-
+            userState.AddPage(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
         }
 
