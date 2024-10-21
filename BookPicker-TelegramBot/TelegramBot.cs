@@ -10,7 +10,7 @@ public class Program
 {
     static UserStateStorage storage = new UserStateStorage();
 
-    static async Task Main(string[] args)
+    static async Task Main()
     {
         string token = "8142383621:AAGGxzdxmaj-gUtZ-pNtD6HMYR1YiJsNJ7I";
         TelegramBotClient telegramBotClient = new TelegramBotClient(
@@ -33,21 +33,12 @@ public class Program
 
     static async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && update.Type != Telegram.Bot.Types.Enums.UpdateType.Message)
+        if (update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
         {
             return;
         }
 
-        long telegramUserId;
-
-        if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
-        {
-            telegramUserId = update.CallbackQuery.From.Id;
-        }
-        else
-        {
-            telegramUserId = update.Message.From.Id;
-        }
+        long telegramUserId = update!.CallbackQuery!.From.Id;
 
         Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
 
@@ -75,7 +66,7 @@ public class Program
         {
             await client.EditMessageTextAsync(
             chatId: telegramUserId,
-            messageId: update.CallbackQuery.Message.MessageId,
+            messageId: update!.CallbackQuery!.Message!.MessageId,
             text: result.Text,
             replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup,
             parseMode: result.ParseMode);

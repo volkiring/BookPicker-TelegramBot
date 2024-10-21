@@ -9,10 +9,12 @@ namespace BookPicker_TelegramBot.User
     public class UserData
     {
         public int Id { get; set; }
+        public Book CurrentBook { get; set; }
 
         public override string ToString()
         {
             return $"{Id}";
         }
+
     }
 }

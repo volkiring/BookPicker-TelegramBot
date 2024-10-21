@@ -7,8 +7,7 @@ namespace BookPicker_TelegramBot.User.Pages
     {
         public PageResult View(Update update, UserState userState)
         {
-            var text = @"Здравствуйте\!
-Выберите действие, которое хотите совершить:";
+            var text = GetText();
 
             var replyMarkup = GetReplyMarkup();
 
@@ -20,14 +19,14 @@ namespace BookPicker_TelegramBot.User.Pages
 
         public PageResult Handle(Update update, UserState userState)
         {
-            switch (update.CallbackQuery.Data)
+            switch (update!.CallbackQuery!.Data)
             {
                 case "Книги месяца":
                     return new BookOfMonthPage().View(update, userState);
                 case "Выбрать книгу":
                     return new ChoosingBookPage().View(update, userState);
                 case "Закладки":
-                    return new BookmatePage().View(update, userState);
+                    return new BookmarksPage().View(update, userState);
                 case "Ежедневное чтение":
                     return new DailyReadingPage().View(update, userState);
                 default:
@@ -52,6 +51,13 @@ namespace BookPicker_TelegramBot.User.Pages
                          InlineKeyboardButton.WithCallbackData("Ежедневное чтение")
                     ]
                 ]);
+        }
+
+        public string GetText()
+        {
+            return @"Здравствуйте\!
+Выберите действие, которое хотите совершить:";
+
         }
     }
 }

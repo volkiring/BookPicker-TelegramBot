@@ -3,7 +3,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
-    public class BookmatePage : IPage
+    public class BookmarksPage : IPage
     {
         public PageResult Handle(Update update, UserState userState)
         {
