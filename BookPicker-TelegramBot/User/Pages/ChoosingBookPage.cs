@@ -1,51 +1,46 @@
-﻿using Telegram.Bot.Types;
+﻿using BookPicker_TelegramBot.Storage;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
     public class ChoosingBookPage : IPage
     {
+        public PageResult Handle(Update update, UserState Userstate)
+        {
+            throw new NotImplementedException();
+        }
 
         public PageResult View(Update update, UserState userState)
         {
-            var text = @"Выберите, по какому критерию будете
-выбирать книгу::";
-
-            var replyMarkup = GetReplyMarkup();
-
-            return new PageResult(text, replyMarkup)
+            if (userState.UserData.CurrentStatus.Item1 == "genre")
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
-            };
-        }
+                var genre = userState.UserData.CurrentStatus.Item2;
+                var text = @"Вот книги по выбранному вами жанру";
+                var replyMarkup = GetReplyMarkup(UserBooksStorage.Books.Where(x => x.Genre == genre));
 
-        public PageResult Handle(Update update, UserState userState)
-        {
-            switch (update.CallbackQuery.Data)
+                return new PageResult(text, replyMarkup)
+                {
+                    UpdatedUserState = new UserState(this, userState.UserData)
+                };
+            }
+
+            else
             {
-                case "Назад":
-                    return new StartPage().View(update, userState);
-                default:
-                    return null;
+                var author = userState.UserData.CurrentStatus.Item2;
+                var text = @"Вот книги выбранного вами автора";
+                var replyMarkup = GetReplyMarkup(UserBooksStorage.Books.Where(x => x.Author == author));
+
+                return new PageResult(text, replyMarkup)
+                {
+                    UpdatedUserState = new UserState(this, userState.UserData)
+                };
             }
         }
 
-        public IReplyMarkup GetReplyMarkup()
+        private IReplyMarkup GetReplyMarkup(IEnumerable<Book> books)
         {
-            return new InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton.WithCallbackData("Выбрать книгу по автору")
-                    ],
-
-                    [
-                       InlineKeyboardButton.WithCallbackData("Выбрать книгу по жанру")
-                    ],
-
-                    [
-                        InlineKeyboardButton.WithCallbackData("Назад"),
-                    ]
-                ]);
+            return Book.CreateInlineKeyboardBooks(books.Select(x => x.ToString()));
         }
 
     }

@@ -33,45 +33,107 @@ public class Program
 
     static async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+        if (update.Type != Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && update.Type != Telegram.Bot.Types.Enums.UpdateType.Message)
         {
             return;
         }
 
-        long telegramUserId = update!.CallbackQuery!.From.Id;
+        UserState userState;
 
-        Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
-
-        var IsExistUserState = storage.TryGet(telegramUserId, out var userState);
-
-        if (!IsExistUserState)
+        if (update.Message != null && update.Message.Text == "/start")
         {
-            userState = new UserState(new NotStatedPage(), new UserData());
+            userState = new UserState(new NotStatedPage(), new UserData()); // Переход на NotStatedPage
+            long telegramUserId = update.Message.From.Id;
+
+            Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
+
+            var IsExistUserState = storage.TryGet(telegramUserId, out userState);
+
+            if (!IsExistUserState)
+            {
+                userState = new UserState(new NotStatedPage(), new UserData());
+            }
+
+            Console.WriteLine($"update.Id={update.Id} currentState={userState}");
+
+            var result = userState!.Page.Handle(update, userState); // Обработка NotStatedPage
+
+            Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
+
+            if (!IsExistUserState)
+            {
+                await client.SendTextMessageAsync(
+                    chatId: telegramUserId,
+                    text: result.Text,
+                    replyMarkup: result.ReplyMarkup,
+                    parseMode: result.ParseMode);
+            }
+            else
+            {
+                var currentMessage = update.CallbackQuery?.Message;
+                var newText = result.Text;
+                var newMarkup = result.ReplyMarkup;
+
+                if (currentMessage != null)
+                {
+                    bool isTextChanged = currentMessage.Text != newText;
+                    bool isMarkupChanged = !currentMessage.ReplyMarkup.Equals(newMarkup);
+
+                    if (isTextChanged || isMarkupChanged)
+                    {
+                        await client.EditMessageTextAsync(
+                            chatId: telegramUserId,
+                            messageId: currentMessage.MessageId,
+                            text: newText,
+                            replyMarkup: (InlineKeyboardMarkup)newMarkup,
+                            parseMode: result.ParseMode);
+                    }
+                }
+            }
+
+            storage.AddOrUpdate(telegramUserId, result.UpdatedUserState); // Сохранение состояния
         }
 
-        Console.WriteLine($"update.Id={update.Id}  currentState={userState}");
-
-        var result = userState!.Page.Handle(update, userState);
-        Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
-
-        if (!IsExistUserState)
+        else if (update.CallbackQuery != null)
         {
-            await client.SendTextMessageAsync(
-                chatId: telegramUserId,
-                text: result.Text,
-                replyMarkup: result.ReplyMarkup,
-                parseMode: result.ParseMode);
-        }
-        else
-        {
-            await client.EditMessageTextAsync(
-            chatId: telegramUserId,
-            messageId: update!.CallbackQuery!.Message!.MessageId,
-            text: result.Text,
-            replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup,
-            parseMode: result.ParseMode);
-        }
+            long telegramUserId = update.CallbackQuery.From.Id;
 
-        storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
+            Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
+
+            var IsExistUserState = storage.TryGet(telegramUserId, out userState);
+
+            if (!IsExistUserState)
+            {
+                userState = new UserState(new NotStatedPage(), new UserData()); // Переход на NotStatedPage по умолчанию
+            }
+
+            Console.WriteLine($"update.Id={update.Id} currentState={userState}");
+
+            var result = userState!.Page.Handle(update, userState);
+
+            Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState} current={userState.UserData.CurrentStatus.Item1}{userState.UserData.CurrentStatus.Item2}");
+
+            var currentMessage = update.CallbackQuery.Message;
+            var newText = result.Text;
+            var newMarkup = result.ReplyMarkup;
+
+            bool isTextChanged = currentMessage.Text != newText;
+            bool isMarkupChanged = !currentMessage.ReplyMarkup.Equals(newMarkup);
+
+            if (isTextChanged || isMarkupChanged)
+            {
+                await client.EditMessageTextAsync(
+                    chatId: telegramUserId,
+                    messageId: currentMessage.MessageId,
+                    text: newText,
+                    replyMarkup: (InlineKeyboardMarkup)newMarkup,
+                    parseMode: result.ParseMode);
+            }
+
+            storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
+        }
     }
+
+
+
 }

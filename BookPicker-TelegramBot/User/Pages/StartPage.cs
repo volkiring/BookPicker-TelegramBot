@@ -24,7 +24,7 @@ namespace BookPicker_TelegramBot.User.Pages
                 case "Книги месяца":
                     return new BookOfMonthPage().View(update, userState);
                 case "Выбрать книгу":
-                    return new ChoosingBookPage().View(update, userState);
+                    return new ChooseWay().View(update, userState);
                 case "Закладки":
                     return new BookmarksPage().View(update, userState);
                 case "Ежедневное чтение":
@@ -57,7 +57,6 @@ namespace BookPicker_TelegramBot.User.Pages
         {
             return @"Здравствуйте\!
 Выберите действие, которое хотите совершить:";
-
         }
     }
 }
