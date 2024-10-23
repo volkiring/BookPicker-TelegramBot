@@ -27,7 +27,7 @@ namespace BookPicker_TelegramBot
 
         public override string ToString()
         {
-            return $"{Author}, {Title}";
+            return $"{Title}";
         }
 
         public bool Equals(Book? other)
