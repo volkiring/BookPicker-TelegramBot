@@ -42,7 +42,7 @@ public class Program
 
         if (update.Message != null && update.Message.Text == "/start")
         {
-            userState = new UserState(new NotStatedPage(), new UserData()); // Переход на NotStatedPage
+            userState = new UserState(new NotStatedPage(), new UserData()); 
             long telegramUserId = update.Message.From.Id;
 
             Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
@@ -56,7 +56,7 @@ public class Program
 
             Console.WriteLine($"update.Id={update.Id} currentState={userState}");
 
-            var result = userState!.Page.Handle(update, userState); // Обработка NotStatedPage
+            var result = userState!.Page.Handle(update, userState); 
 
             Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
 
@@ -91,7 +91,7 @@ public class Program
                 }
             }
 
-            storage.AddOrUpdate(telegramUserId, result.UpdatedUserState); // Сохранение состояния
+            storage.AddOrUpdate(telegramUserId, result.UpdatedUserState); 
         }
 
         else if (update.CallbackQuery != null)
@@ -104,14 +104,14 @@ public class Program
 
             if (!IsExistUserState)
             {
-                userState = new UserState(new NotStatedPage(), new UserData()); // Переход на NotStatedPage по умолчанию
+                userState = new UserState(new NotStatedPage(), new UserData()); 
             }
 
             Console.WriteLine($"update.Id={update.Id} currentState={userState}");
 
             var result = userState!.Page.Handle(update, userState);
 
-            Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState} current={userState.UserData.CurrentStatus.Item1}{userState.UserData.CurrentStatus.Item2}");
+            Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState} current={userState.UserData.CurrentFilter}");
 
             var currentMessage = update.CallbackQuery.Message;
             var newText = result.Text;

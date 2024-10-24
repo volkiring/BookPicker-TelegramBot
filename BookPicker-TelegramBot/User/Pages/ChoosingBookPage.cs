@@ -6,16 +6,18 @@ namespace BookPicker_TelegramBot.User.Pages
 {
     public class ChoosingBookPage : IPage
     {
-        public PageResult Handle(Update update, UserState Userstate)
+        public PageResult Handle(Update update, UserState userstate)
         {
-            throw new NotImplementedException();
+            var choosedBook = update.CallbackQuery.Data;
+            userstate.UserData.CurrentBook = UserBooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
+            return new BookPage().View(update, userstate);
         }
 
         public PageResult View(Update update, UserState userState)
         {
-            if (userState.UserData.CurrentStatus.Item1 == "genre")
+            if (userState.UserData.CurrentFilter.Type == FilterType.Genre)
             {
-                var genre = userState.UserData.CurrentStatus.Item2;
+                var genre = userState.UserData.CurrentFilter.Value;
                 var text = @"Вот книги по выбранному вами жанру";
                 var replyMarkup = GetReplyMarkup(UserBooksStorage.Books.Where(x => x.Genre == genre));
 
@@ -27,7 +29,7 @@ namespace BookPicker_TelegramBot.User.Pages
 
             else
             {
-                var author = userState.UserData.CurrentStatus.Item2;
+                var author = userState.UserData.CurrentFilter.Value;
                 var text = @"Вот книги выбранного вами автора";
                 var replyMarkup = GetReplyMarkup(UserBooksStorage.Books.Where(x => x.Author == author));
 

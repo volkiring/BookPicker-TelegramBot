@@ -11,7 +11,11 @@ namespace BookPicker_TelegramBot.User
     public class UserData
     {
         public int Id { get; set; }
-        public (string,string) CurrentStatus{ get; set; }
+        public Filter CurrentFilter { get; set; }
+
+        public Book CurrentBook { get; set; }
+
+        public List<Book> Bookmarks = new List<Book>();
 
         public override string ToString()
         {

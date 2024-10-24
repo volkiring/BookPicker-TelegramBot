@@ -13,7 +13,8 @@ namespace BookPicker_TelegramBot.User.Pages
                 case "Назад":
                     return new ChooseWay().View(update, userState);
                 default:
-                    return null;
+                    userState.UserData.CurrentFilter = new Filter(FilterType.Author, update.CallbackQuery.Data);
+                    return new ChoosingBookPage().View(update, userState);
             }
         }
 
