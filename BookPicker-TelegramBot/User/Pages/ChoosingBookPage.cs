@@ -8,7 +8,7 @@ namespace BookPicker_TelegramBot.User.Pages
     {
         public PageResult Handle(Update update, UserState userstate)
         {
-            var choosedBook = update.CallbackQuery.Data;
+            var choosedBook = update!.CallbackQuery!.Data;
             userstate.UserData.CurrentBook = UserBooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
             return new BookPage().View(update, userstate);
         }

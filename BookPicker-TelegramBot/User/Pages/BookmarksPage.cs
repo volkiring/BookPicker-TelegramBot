@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using BookPicker_TelegramBot.Storage;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
@@ -12,14 +13,17 @@ namespace BookPicker_TelegramBot.User.Pages
                 case "Назад":
                     return new StartPage().View(update, userState);
                 default:
-                    return null;
+                    var choosedBook = update.CallbackQuery.Data;
+                    userState.UserData.CurrentBook = UserBooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
+                    return new BookPage().View(update, userState);
+
             }
         }
 
         public PageResult View(Update update, UserState userState)
         {
             var text = @"Вот книги, которые Вы добавили в закладки:";
-            var replyMarkup = GetReplyMarkup();
+            var replyMarkup = GetReplyMarkup(userState);
 
             return new PageResult(text, replyMarkup)
             {
@@ -27,22 +31,9 @@ namespace BookPicker_TelegramBot.User.Pages
             };
         }
 
-        public IReplyMarkup GetReplyMarkup()
+        private IReplyMarkup GetReplyMarkup(UserState userState)
         {
-            return new InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton.WithCallbackData("Книга 1")
-                    ],
-
-                    [
-                       InlineKeyboardButton.WithCallbackData("Книга 2")
-                    ],
-
-                    [
-                        InlineKeyboardButton.WithCallbackData("Назад"),
-                    ]
-                ]);
+            return Book.CreateInlineKeyboardBooks(userState.UserData.Bookmarks.Select(x => x.ToString()));
         }
     }
 }

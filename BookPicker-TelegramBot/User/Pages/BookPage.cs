@@ -9,13 +9,13 @@ namespace BookPicker_TelegramBot.User.Pages
         {
             switch (update.CallbackQuery.Data)
             {
-                case "Назад":
-                    return new ChoosingBookPage().View(update, userState);
+                case "Вернуться в главное меню":
+                    return new StartPage().View(update, userState);
                 case "Удалить из закладок":
                     userState.UserData.Bookmarks.Remove(userState.UserData.CurrentBook);
                     return new BookPage().View(update, userState);
                 default:
-                    userState.UserData.Bookmarks.Remove(userState.UserData.CurrentBook);
+                    userState.UserData.Bookmarks.Add(userState.UserData.CurrentBook);
                     return new BookPage().View(update, userState);
             }
         }
@@ -53,7 +53,7 @@ namespace BookPicker_TelegramBot.User.Pages
                     ],
 
                     [
-                        InlineKeyboardButton.WithCallbackData("Назад"),
+                        InlineKeyboardButton.WithCallbackData("Вернуться в главное меню"),
                     ]
               ]);
             }
@@ -71,7 +71,7 @@ namespace BookPicker_TelegramBot.User.Pages
                     ],
 
                     [
-                        InlineKeyboardButton.WithCallbackData("Назад"),
+                        InlineKeyboardButton.WithCallbackData("Вернуться в главное меню"),
                     ]
 ]);
             }

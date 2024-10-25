@@ -12,7 +12,6 @@ namespace BookPicker_TelegramBot.User
     {
         public int Id { get; set; }
         public Filter CurrentFilter { get; set; }
-
         public Book CurrentBook { get; set; }
 
         public List<Book> Bookmarks = new List<Book>();
