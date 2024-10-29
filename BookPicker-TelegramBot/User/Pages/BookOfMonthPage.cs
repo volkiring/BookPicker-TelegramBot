@@ -5,17 +5,16 @@ namespace BookPicker_TelegramBot.User.Pages
 {
     public class BookOfMonthPage : IPage
     {
-
-
         public PageResult View(Update update, UserState userState)
         {
             var text = @"Вот книги, которые чаще всего пользователи добавляют в закладки:";
 
             var replyMarkup = GetReplyMarkup();
 
+            userState.Pages.Push(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
         }
 

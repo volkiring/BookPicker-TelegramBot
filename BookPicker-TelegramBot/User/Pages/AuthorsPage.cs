@@ -11,7 +11,8 @@ namespace BookPicker_TelegramBot.User.Pages
             switch (update!.CallbackQuery!.Data)
             {
                 case "Назад":
-                    return new ChooseWay().View(update, userState);
+                    userState.Pages.Pop();
+                    return userState.CurrentPage.View(update, userState);
                 default:
                     userState.UserData.CurrentFilter = new Filter(FilterType.Author, update.CallbackQuery.Data);
                     return new ChoosingBookPage().View(update, userState);
@@ -23,9 +24,10 @@ namespace BookPicker_TelegramBot.User.Pages
             var text = @"Вот список авторов, книги которых вы можете выбрать";
             var replyMarkup = GetReplyMarkup();
 
+            userState.AddPage(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
         }
 

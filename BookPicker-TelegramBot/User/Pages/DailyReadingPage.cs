@@ -21,9 +21,10 @@ namespace BookPicker_TelegramBot.User.Pages
             var text = @"Вот книги, которые Вы добавили для ежедневного чтения:";
             var replyMarkup = GetReplyMarkup();
 
+            userState.AddPage(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
         }
 

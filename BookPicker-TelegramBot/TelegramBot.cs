@@ -47,17 +47,20 @@ public class Program
         if (isMessageUpdate || isCallbackQuery)
         {
             Console.WriteLine($"update.Id={update.Id} telegramUserId={telegramUserId}");
-            var isUserStateExist = storage.TryGet(telegramUserId, out userState);
+
+            bool isUserStateExist = storage.TryGet(telegramUserId, out userState);
 
             if (!isUserStateExist)
             {
-                userState = new UserState(new NotStatedPage(), new UserData());
+                userState = new UserState(new Stack<IPage>([new NotStatedPage()]), new UserData());
+                storage.AddOrUpdate(telegramUserId, userState); 
             }
 
-            var result = userState!.Page.Handle(update, userState);
+            var result = userState.CurrentPage.Handle(update, userState);
             Console.WriteLine($"update.Id={update.Id} text={result.Text} updatedState={result.UpdatedUserState}");
 
-            if (!isUserStateExist && isMessageUpdate)
+
+            if (isMessageUpdate)
             {
                 await client.SendTextMessageAsync(
                     chatId: telegramUserId,
@@ -67,11 +70,13 @@ public class Program
             }
             else if (isCallbackQuery)
             {
+                
                 var currentMessage = update.CallbackQuery.Message;
                 if (currentMessage != null)
                 {
                     bool isTextChanged = currentMessage.Text != result.Text;
                     bool isMarkupChanged = currentMessage.ReplyMarkup == null || !currentMessage.ReplyMarkup.Equals(result.ReplyMarkup);
+
 
                     if (isTextChanged || isMarkupChanged)
                     {
@@ -82,20 +87,13 @@ public class Program
                             replyMarkup: (InlineKeyboardMarkup)result.ReplyMarkup,
                             parseMode: result.ParseMode);
                     }
-                    else
-                    {
-                        await client.SendTextMessageAsync(
-                            chatId: telegramUserId,
-                            text: result.Text,
-                            replyMarkup: result.ReplyMarkup,
-                            parseMode: result.ParseMode);
-                    }
                 }
             }
 
             storage.AddOrUpdate(telegramUserId, result.UpdatedUserState);
         }
     }
+
 
 
 }

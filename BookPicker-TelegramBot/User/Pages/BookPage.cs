@@ -10,7 +10,11 @@ namespace BookPicker_TelegramBot.User.Pages
             switch (update.CallbackQuery.Data)
             {
                 case "Вернуться в главное меню":
-                    return new StartPage().View(update, userState);
+                    while (userState.Pages.Peek() != new StartPage())
+                    {
+                        userState.Pages.Pop();
+                    }
+                    return userState.CurrentPage.View(update, userState);
                 case "Удалить из закладок":
                     userState.UserData.Bookmarks.Remove(userState.UserData.CurrentBook);
                     return new BookPage().View(update, userState);
@@ -31,11 +35,11 @@ namespace BookPicker_TelegramBot.User.Pages
             }
             var replyMarkup = GetReplyMarkup(currentBook, IsExistBookmark);
 
+            userState.AddPage(this);
             return new PageResult(text, replyMarkup)
             {
-                UpdatedUserState = new UserState(this, userState.UserData)
+                UpdatedUserState = userState
             };
-
         }
 
         private IReplyMarkup GetReplyMarkup(Book book, bool IsExistBookmark)
