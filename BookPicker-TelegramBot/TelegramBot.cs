@@ -15,8 +15,9 @@ public class Program
     static string token = "8142383621:AAGGxzdxmaj-gUtZ-pNtD6HMYR1YiJsNJ7I";
 
     static TelegramBotClient telegramBotClient = new TelegramBotClient(
-        token: token
-        );
+    token: token
+    );
+
     static async Task Main()
     {
         var me = telegramBotClient.GetMeAsync().Result;

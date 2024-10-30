@@ -8,55 +8,58 @@ using System.Threading.Tasks;
 
 namespace BookPicker_TelegramBot.Storage
 {
+    using BookPicker_TelegramBot.Firebase;
+    using BookPicker_TelegramBot.User.Pages;
     using System.Collections.Concurrent;
     using System.IO;
     using System.Text.Json;
 
     public class UserStateStorage
     {
-        private readonly ConcurrentDictionary<long, UserState> cache = new ConcurrentDictionary<long, UserState>();
-        private const string FilePath = "userStates.json";
-
-        public UserStateStorage()
-        {
-            LoadFromFile(); 
-        }
+        private readonly FirebaseProvider firebaseProvider = new();
 
         public void AddOrUpdate(long telegramId, UserState userState)
         {
-            cache.AddOrUpdate(telegramId, userState, (x, y) => userState);
-            SaveToFile(); 
+            var userStateFirebase = ToUserStateFirebase(userState);
+            firebaseProvider.AddOrUpdateAsync($"userstates/{telegramId}", userStateFirebase);
         }
 
-        public bool TryGet(long telegramId, out UserState userState)
+        public async Task<UserState?> TryGetAsync(long telegramId)
         {
-            return cache.TryGetValue(telegramId, out userState);
-        }
-
-        private void SaveToFile()
-        {
-            try
+            var userStateFirebase = await firebaseProvider.TryGetAsync<UserStateFirebase>($"userstates/{telegramId}");
+            if (userStateFirebase == null)
             {
-                var json = JsonSerializer.Serialize(cache);
-                File.WriteAllText(FilePath, json);
+                return null;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving user states to file: {ex.Message}");
-            }
+            return ToUserState(userStateFirebase);
         }
 
-        private void LoadFromFile()
+        private static UserState? ToUserState(UserStateFirebase userStateFirebase)
         {
-            if (!File.Exists(FilePath)) return;
+            var pages = userStateFirebase.PageNames?.Select(x => PagesFactory.GetPage(x)).Reverse().ToList();
+            return new UserState(new Stack<IPage>(pages), userStateFirebase.UserData);
+
+        }
 
         private static UserStateFirebase ToUserStateFirebase(UserState userState)
-            {
+        {
             return new UserStateFirebase
-                {
+            {
                 UserData = userState.UserData,
                 PageNames = userState.Pages?.Select(x => x.GetType().Name).ToList()
             };
-    }
+        }
 
+        public async Task<List<UserState>> GetAllUsersAsync()
+        {
+            var allUserStatesFirebase = await firebaseProvider.GetAllAsync<UserStateFirebase>("userstates");
+
+            return allUserStatesFirebase
+                .Select(ToUserState)
+                .Where(userState => userState != null)
+                .ToList()!;
+        }
+
+
+    }
 }

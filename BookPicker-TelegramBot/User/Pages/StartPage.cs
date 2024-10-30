@@ -33,7 +33,7 @@ namespace BookPicker_TelegramBot.User.Pages
                 case "Закладки":
                     return new BookmarksPage().View(update, userState);
                 case "Ежедневное чтение":
-                    return new DailyReadingPage().View(update, userState);
+                    return new ReminderPage().View(update, userState);
                 default:
                     return null;
             }

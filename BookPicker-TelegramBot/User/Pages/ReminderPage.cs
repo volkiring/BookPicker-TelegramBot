@@ -1,52 +1,44 @@
-﻿using Telegram.Bot.Types;
+﻿using BookPicker_TelegramBot.Storage;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
 {
-    public class DailyReadingPage : IPage
+    public class ReminderPage : IPage
     {
         public PageResult Handle(Update update, UserState userState)
         {
             switch (update.CallbackQuery.Data)
             {
                 case "Назад":
-                    return new StartPage().View(update, userState);
+                    userState.Pages.Pop();
+                    return userState.CurrentPage.View(update, userState);
                 default:
-                    return null;
+                    var choosedBook = update!.CallbackQuery!.Data;
+                    userState.UserData.CurrentBook = BooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
+                    return new BookPage().View(update, userState);
             }
         }
 
         public PageResult View(Update update, UserState userState)
         {
             var text = @"Вот книги, которые Вы добавили для ежедневного чтения:";
-            var replyMarkup = GetReplyMarkup();
+            var replyMarkup = GetReplyMarkup(userState);
 
             if (!userState.Pages.Contains(this))
             {
                 userState.AddPage(this);
             }
+
             return new PageResult(text, replyMarkup)
             {
                 UpdatedUserState = userState
             };
         }
 
-        public IReplyMarkup GetReplyMarkup()
+        public IReplyMarkup GetReplyMarkup(UserState userState)
         {
-            return new InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton.WithCallbackData("Книга 1")
-                    ],
-
-                    [
-                       InlineKeyboardButton.WithCallbackData("Книга 2")
-                    ],
-
-                    [
-                        InlineKeyboardButton.WithCallbackData("Назад"),
-                    ]
-                ]);
+            return Book.CreateInlineKeyboardBooks(userState.UserData.Reminders.Select(x => x.Book.ToString()));
         }
     }
 }
