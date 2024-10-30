@@ -17,16 +17,20 @@ namespace BookPicker_TelegramBot.User.Pages
                 case "Назад":
                     userState.Pages.Pop();
                     return userState.CurrentPage.View(update, userState);
+                case "10:00":
+                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(10, 00, 0)));
+                    userState.Pages.Pop();
+                    return userState.CurrentPage.View(update, userState);
                 case "13:00":
-                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(13, 0, 0)));
+                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(13, 00, 0)));
                     userState.Pages.Pop();
                     return userState.CurrentPage.View(update, userState);
                 case "16:00":
-                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(16, 0, 0)));
+                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(16, 00, 0)));
                     userState.Pages.Pop();
                     return userState.CurrentPage.View(update, userState);
                 case "19:00":
-                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(19, 0, 0)));
+                    userState.UserData.Reminders.Add(new Reminder(userState.UserData.CurrentBook, new TimeSpan(19, 00, 0)));
                     userState.Pages.Pop();
                     return userState.CurrentPage.View(update, userState);
                 default:
@@ -55,7 +59,8 @@ namespace BookPicker_TelegramBot.User.Pages
         {
             return new InlineKeyboardMarkup(
                 [
-                    [
+                    [                        
+                        InlineKeyboardButton.WithCallbackData("10:00"),
                         InlineKeyboardButton.WithCallbackData("13:00"),
                         InlineKeyboardButton.WithCallbackData("16:00"),
                         InlineKeyboardButton.WithCallbackData("19:00")

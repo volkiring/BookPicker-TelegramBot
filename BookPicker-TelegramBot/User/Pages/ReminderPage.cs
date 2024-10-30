@@ -38,7 +38,7 @@ namespace BookPicker_TelegramBot.User.Pages
 
         public IReplyMarkup GetReplyMarkup(UserState userState)
         {
-            return Book.CreateInlineKeyboardBooks(userState.UserData.Reminders.Select(x => x.Book.ToString()));
+            return Book.CreateInlineKeyboardBooks(userState.UserData.Reminders.Select(x => $"{x.Book.ToString()} " + string.Format("{0:00}:{1:00}", x.Time.Hours, x.Time.Minutes)));
         }
     }
 }
