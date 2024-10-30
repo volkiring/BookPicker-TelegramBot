@@ -24,7 +24,10 @@ namespace BookPicker_TelegramBot.User.Pages
             var text = @"Вот жанры, которые вы можете выбрать для чтения";
             var replyMarkup = GetReplyMarkup();
 
-            userState.AddPage(this);
+            if (!userState.Pages.Contains(this))
+            {
+                userState.AddPage(this);
+            }
             return new PageResult(text, replyMarkup)
             {
                 UpdatedUserState = userState
@@ -33,7 +36,7 @@ namespace BookPicker_TelegramBot.User.Pages
 
         private IReplyMarkup GetReplyMarkup()
         {
-            return Book.CreateInlineKeyboardBooks(UserBooksStorage.Books.Select(x => x.Genre).ToHashSet());
+            return Book.CreateInlineKeyboardBooks(BooksStorage.Books.Select(x => x.Genre).ToHashSet());
         }
     }
 }

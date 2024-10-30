@@ -15,7 +15,7 @@ namespace BookPicker_TelegramBot.User.Pages
                     return userState.CurrentPage.View(update, userState);
                 default:
                     var choosedBook = update.CallbackQuery.Data;
-                    userState.UserData.CurrentBook = UserBooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
+                    userState.UserData.CurrentBook = BooksStorage.Books.FirstOrDefault(x => x.Title == choosedBook);
                     return new BookPage().View(update, userState);
 
             }
@@ -26,7 +26,10 @@ namespace BookPicker_TelegramBot.User.Pages
             var text = @"Вот книги, которые Вы добавили в закладки:";
             var replyMarkup = GetReplyMarkup(userState);
 
-            userState.AddPage(this);
+            if (!userState.Pages.Contains(this))
+            {
+                userState.AddPage(this);
+            }
             return new PageResult(text, replyMarkup)
             {
                 UpdatedUserState = userState

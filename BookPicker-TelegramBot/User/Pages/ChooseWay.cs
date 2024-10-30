@@ -13,7 +13,10 @@ namespace BookPicker_TelegramBot.User.Pages
 
             var replyMarkup = GetReplyMarkup();
 
-            userState.AddPage(this);
+            if (!userState.Pages.Contains(this))
+            {
+                userState.AddPage(this);
+            }
             return new PageResult(text, replyMarkup)
             {
                 UpdatedUserState = userState

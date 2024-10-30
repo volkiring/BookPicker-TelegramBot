@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace BookPicker_TelegramBot.Storage
 {
-    public static class UserBooksStorage
+    public static class BooksStorage
     {
-        public static ConcurrentDictionary<long, HashSet<Book>> Bookmarks = new();
-
         public static List<Book> Books = new List<Book>
         {
             new Book("Война и мир", "Лев Толстой", "Роман", 1869, "https://example.com/war_and_peace"),

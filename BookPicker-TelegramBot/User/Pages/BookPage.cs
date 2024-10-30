@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using Telegram.Bot.Requests;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BookPicker_TelegramBot.User.Pages
@@ -9,18 +10,23 @@ namespace BookPicker_TelegramBot.User.Pages
         {
             switch (update.CallbackQuery.Data)
             {
-                case "Вернуться в главное меню":
-                    while (userState.Pages.Peek() != new StartPage())
+                case "Добавить напоминание":
+                    return new ChooseReminderTimePage().View(update, userState);
+                case "Удалить из закладок":
+                    userState.UserData.Bookmarks.Remove(userState.UserData.CurrentBook);
+                    return new BookPage().View(update, userState);
+                case "Удалить напоминание":
+                    userState.UserData.Reminders.RemoveAll(x => x.Book.Equals(userState.UserData.CurrentBook));
+                    return new BookPage().View(update, userState);
+                case "Добавить в закладки":
+                    userState.UserData.Bookmarks.Add(userState.UserData.CurrentBook);
+                    return new BookPage().View(update, userState);
+                default:
+                    while (userState.CurrentPage.GetType() != typeof(StartPage))
                     {
                         userState.Pages.Pop();
                     }
                     return userState.CurrentPage.View(update, userState);
-                case "Удалить из закладок":
-                    userState.UserData.Bookmarks.Remove(userState.UserData.CurrentBook);
-                    return new BookPage().View(update, userState);
-                default:
-                    userState.UserData.Bookmarks.Add(userState.UserData.CurrentBook);
-                    return new BookPage().View(update, userState);
             }
         }
 
@@ -29,57 +35,84 @@ namespace BookPicker_TelegramBot.User.Pages
             var currentBook = userState.UserData.CurrentBook;
             string text = currentBook.ToString();
             var IsExistBookmark = false;
+            var reminderBooks = userState.UserData?.Reminders.Select(x => x.Book);
+            var IsExistReminder = false;
+
             if (userState.UserData.Bookmarks!.Contains(currentBook))
             {
                 IsExistBookmark = true;
             }
-            var replyMarkup = GetReplyMarkup(currentBook, IsExistBookmark);
 
-            userState.AddPage(this);
+            if (reminderBooks!.Contains(currentBook)) 
+            {
+                IsExistReminder = true;
+            }
+
+
+            var replyMarkup = GetReplyMarkup(currentBook, IsExistBookmark, IsExistReminder);
+
+            if (!userState.Pages.Contains(this))
+            {
+                userState.AddPage(this);
+            }
             return new PageResult(text, replyMarkup)
             {
                 UpdatedUserState = userState
             };
         }
 
-        private IReplyMarkup GetReplyMarkup(Book book, bool IsExistBookmark)
+
+        private IReplyMarkup GetReplyMarkup(Book book, bool IsExistBookmark, bool IsExistReminder)
         {
+            var buttons = new List<List<InlineKeyboardButton>>
+    {
+        new List<InlineKeyboardButton>
+        {
+            InlineKeyboardButton.WithUrl("Читать сейчас", book.LinkToRead)
+        }
+    };
+
             if (IsExistBookmark)
             {
-                return new InlineKeyboardMarkup(
-              [
-                  [
-                        InlineKeyboardButton.WithUrl("Читать сейчас", book.LinkToRead)
-                    ],
-
-                    [
-                       InlineKeyboardButton.WithCallbackData("Удалить из закладок")
-                    ],
-
-                    [
-                        InlineKeyboardButton.WithCallbackData("Вернуться в главное меню"),
-                    ]
-              ]);
+                buttons.Add(new List<InlineKeyboardButton>
+        {
+            InlineKeyboardButton.WithCallbackData("Удалить из закладок")
+        });
             }
-
             else
             {
-                return new InlineKeyboardMarkup(
-[
-  [
-                        InlineKeyboardButton.WithUrl("Читать сейчас", book.LinkToRead)
-                    ],
-
-                    [
-                       InlineKeyboardButton.WithCallbackData("Добавить в закладки")
-                    ],
-
-                    [
-                        InlineKeyboardButton.WithCallbackData("Вернуться в главное меню"),
-                    ]
-]);
+                buttons.Add(new List<InlineKeyboardButton>
+        {
+            InlineKeyboardButton.WithCallbackData("Добавить в закладки")
+        });
             }
+
+            
+            if (IsExistReminder)
+            {
+                buttons.Add(new List<InlineKeyboardButton>
+        {
+            InlineKeyboardButton.WithCallbackData("Удалить напоминание")
+        });
+            }
+            else
+            {
+                buttons.Add(new List<InlineKeyboardButton>
+        {
+            InlineKeyboardButton.WithCallbackData("Добавить напоминание")
+        });
+            }
+
+            
+            buttons.Add(new List<InlineKeyboardButton>
+    {
+        InlineKeyboardButton.WithCallbackData("Вернуться в главное меню")
+    });
+
+            return new InlineKeyboardMarkup(buttons);
         }
+
     }
 }
+
 

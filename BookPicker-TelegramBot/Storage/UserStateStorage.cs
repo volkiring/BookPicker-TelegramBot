@@ -50,23 +50,13 @@ namespace BookPicker_TelegramBot.Storage
         {
             if (!File.Exists(FilePath)) return;
 
-            try
+        private static UserStateFirebase ToUserStateFirebase(UserState userState)
             {
-                var json = File.ReadAllText(FilePath);
-                var data = JsonSerializer.Deserialize<ConcurrentDictionary<long, UserState>>(json);
-                if (data != null)
+            return new UserStateFirebase
                 {
-                    foreach (var kvp in data)
-                    {
-                        cache[kvp.Key] = kvp.Value;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading user states from file: {ex.Message}");
-            }
-        }
+                UserData = userState.UserData,
+                PageNames = userState.Pages?.Select(x => x.GetType().Name).ToList()
+            };
     }
 
 }
